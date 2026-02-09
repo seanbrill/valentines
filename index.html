@@ -106,6 +106,19 @@
             transform: scale(1.05);
         }
 
+        .photo-gallery img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .photo-gallery img:hover {
+            transform: scale(1.05);
+        }
+
         .buttons {
             display: flex;
             gap: 20px;
@@ -193,23 +206,20 @@
             <p class="pun">"You're PAW-sitively perfect for me!"</p>
 
             <div class="puppy-section">
-                <img src="https://media.giphy.com/media/mCRJDo24UvJMA/giphy.gif" alt="Cute chocolate lab puppy">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWQ4YzQ3ZjY3MTU4OGQ1YjM3NjU1YWZiODQ2YzA2MzU5ZjUzNjc0YiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/n3xSURTYFhPSU/giphy.gif" alt="Cute chocolate lab puppy">
             </div>
 
             <p class="pun">"I'm MUTTS about you!"</p>
 
             <div class="puppy-section">
-                <img src="https://media.giphy.com/media/kiBcwEXegBTACmVOnE/giphy.gif" alt="Adorable chocolate lab">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWM0ZGU0YzQ2YjBlNGI2ZGJkYzY5ZTQ5NjQwMjcwNTBhNjU2YTc5YiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/3oEjHWPTo7c0ajPwty/giphy.gif" alt="Adorable chocolate lab">
             </div>
 
             <p class="pun">"We're a PAW-FECT match!"</p>
 
             <h2 style="color: #d81b60; margin: 30px 0;">Our Memories Together 📸</h2>
-            <div class="photo-gallery">
-                <div class="photo-placeholder">📷 Photo of Us #1</div>
-                <div class="photo-placeholder">📷 Photo of Us #2</div>
-                <div class="photo-placeholder">📷 Photo of Us #3</div>
-                <div class="photo-placeholder">📷 Photo of Us #4</div>
+            <div class="photo-gallery" id="photoGallery">
+                <div class="photo-placeholder">📷 Loading our photos...</div>
             </div>
 
             <h2 style="color: #ff1744; margin: 40px 0; font-size: 2.5em;">
@@ -227,7 +237,7 @@
                 🎉 YAY! I LOVE YOU SO MUCH! 🎉
             </div>
             <div class="puppy-section">
-                <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" alt="Excited puppy">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMzQ1YjZhNDgwZTg3MjYwYzBkOWI2ZGU0ZDg4OGQyNTI0NzJjNTM3YiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/13CoXDiaCcCoyk/giphy.gif" alt="Excited chocolate lab puppy">
             </div>
             <p style="font-size: 1.5em; color: #d81b60; margin-top: 20px;">
                 You just made me the happiest person alive! 💕
@@ -239,7 +249,7 @@
                 WHY WOULD YOU SELECT NO?! 😭
             </h2>
             <div class="puppy-section">
-                <img src="https://media.giphy.com/media/L95W4wv8nnb9K/giphy.gif" alt="Sad puppy">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzQ5OWY3YzI0NDU0MWQ0NWQ3ZGY1ZTM0YjE1NjY0NzU1ZGM0M2FmNiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/OPU6wzx8JrHna/giphy.gif" alt="Sad chocolate lab puppy">
             </div>
             <p class="try-again">
                 But really... come on... you know you want to say yes! 🥺
@@ -254,14 +264,51 @@
     </div>
 
     <script>
+        // ========== CONFIGURATION ==========
+        // Update these values to change the photo source
+        const CONFIG = {
+            // FileFreak folder URL - change this to update which photos are displayed
+            photoFolderUrl: 'https://api.filefreak.io/public-list/ki1a-3m7s-1fen-mphc-ey3b-xg0o-th80-020q-t9wd/Photos/Valentines%20Project',
+            // FileFreak API endpoint to get individual files
+            fileApiUrl: 'https://api.filefreak.io/get-file/'
+        };
+        // ===================================
+
         const mainContent = document.getElementById('mainContent');
         const yesResponse = document.getElementById('yesResponse');
         const noResponse = document.getElementById('noResponse');
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
         const actuallyYesBtn = document.getElementById('actuallyYesBtn');
+        const photoGallery = document.getElementById('photoGallery');
 
         let noBtnClickCount = 0;
+
+        // Load photos from FileFreak API
+        async function loadPhotos() {
+            try {
+                const response = await fetch(CONFIG.photoFolderUrl);
+                const data = await response.json();
+
+                // Clear the loading placeholder
+                photoGallery.innerHTML = '';
+
+                // Add each photo to the gallery
+                data.files.forEach(file => {
+                    const img = document.createElement('img');
+                    img.src = `${CONFIG.fileApiUrl}${file.id}`;
+                    img.alt = 'Our memory together';
+                    img.loading = 'lazy';
+                    photoGallery.appendChild(img);
+                });
+            } catch (error) {
+                console.error('Error loading photos:', error);
+                photoGallery.innerHTML = '<div class="photo-placeholder">❤️ Photos loading...</div>';
+            }
+        }
+
+        // Load photos when the page loads
+        loadPhotos();
 
         yesBtn.addEventListener('click', () => {
             mainContent.classList.add('hidden');
