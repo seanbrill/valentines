@@ -293,17 +293,23 @@
                 // Clear the loading placeholder
                 photoGallery.innerHTML = '';
 
-                // Add each photo to the gallery
-                data.files.forEach(file => {
-                    const img = document.createElement('img');
-                    img.src = `${CONFIG.fileApiUrl}${file.id}`;
-                    img.alt = 'Our memory together';
-                    img.loading = 'lazy';
-                    photoGallery.appendChild(img);
-                });
+                // Check if we got objects successfully
+                if (data.success && data.objects && data.objects.length > 0) {
+                    // Add each photo to the gallery
+                    data.objects.forEach(file => {
+                        const img = document.createElement('img');
+                        // Use the objectUrl directly from the API response
+                        img.src = file.objectUrl;
+                        img.alt = 'Our memory together';
+                        img.loading = 'lazy';
+                        photoGallery.appendChild(img);
+                    });
+                } else {
+                    photoGallery.innerHTML = '<div class="photo-placeholder">❤️ No photos found</div>';
+                }
             } catch (error) {
                 console.error('Error loading photos:', error);
-                photoGallery.innerHTML = '<div class="photo-placeholder">❤️ Photos loading...</div>';
+                photoGallery.innerHTML = '<div class="photo-placeholder">❤️ Error loading photos</div>';
             }
         }
 
