@@ -298,8 +298,8 @@
                     // Add each photo to the gallery
                     data.objects.forEach(file => {
                         const img = document.createElement('img');
-                        // Use the objectUrl directly from the API response
-                        img.src = file.objectUrl;
+                        // Use the FileFreak get-file API with the object ID
+                        img.src = `${CONFIG.fileApiUrl}${file.id}`;
                         img.alt = 'Our memory together';
                         img.loading = 'lazy';
                         photoGallery.appendChild(img);
